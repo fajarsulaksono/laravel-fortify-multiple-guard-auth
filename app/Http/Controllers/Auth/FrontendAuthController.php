@@ -10,16 +10,11 @@ use Illuminate\Routing\Pipeline;
 use Laravel\Fortify\Actions\CanonicalizeUsername;
 use Laravel\Fortify\Actions\EnsureLoginIsNotThrottled;
 use Laravel\Fortify\Actions\PrepareAuthenticatedSession;
-use App\Actions\Fortify\AttemptToAuthenticate;
 use App\Actions\Fortify\AttemptToAuthenticateFrontend;
-use App\Actions\Fortify\RedirectIfTwoFactorAuthenticatable;
 use App\Actions\Fortify\RedirectIfTwoFactorAuthenticatableFrontend;
 use Illuminate\Contracts\Auth\StatefulGuard;
-use App\Guards\FrontendStatefulGuard;
 use App\Http\Responses\FrontendLoginResponse;
 use App\Http\Responses\FrontendLogoutResponse;
-use App\Http\Responses\FrontendRegisterViewResponse;
-use App\Http\Responses\FrontendCreateNewUser;
 use Laravel\Fortify\Contracts\LoginViewResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Features;
@@ -140,7 +135,6 @@ class FrontendAuthController extends Controller
                         ->withInput();
         }
 
-        // Retrieve the validated input...
         $validated = $validator->validated();
 
         UserFrontend::create([
