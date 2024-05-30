@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Login - SantriKoding.com'])
+@extends('layouts.app', ['title' => 'Login'])
 
 @section('content')
 

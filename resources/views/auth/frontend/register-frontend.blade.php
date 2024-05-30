@@ -1,13 +1,20 @@
-@extends('layouts.app', ['title' => 'Register'])
+@extends('layouts.app', ['title' => 'Register Frontend'])
 
 @section('content')
 
 <div class="col-md-8">
     <div class="card border-0 shadow rounded">
         <div class="card-body">
-            <h4 class="font-weight-bold">REGISTER</h4>
+            <h4 class="font-weight-bold">Register Frontend</h4>
             <hr>
-            <form action="{{ route('register') }}" method="POST">
+            @php
+                if (!empty(session('message'))) {
+                    @endphp
+                    <div class="alert alert-success">{{ session('message') }}</div>
+                    @php
+                }
+            @endphp
+            <form action="{{ url('/register/frontend') }}" method="POST">
                 @csrf
 
                 <div class="row">

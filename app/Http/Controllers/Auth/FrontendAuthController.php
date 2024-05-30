@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use Auth;
+use App\Models\UserFrontend;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Pipeline;
@@ -17,14 +18,22 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use App\Guards\FrontendStatefulGuard;
 use App\Http\Responses\FrontendLoginResponse;
 use App\Http\Responses\FrontendLogoutResponse;
+use App\Http\Responses\FrontendRegisterViewResponse;
+use App\Http\Responses\FrontendCreateNewUser;
 use Laravel\Fortify\Contracts\LoginViewResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use App\Actions\Fortify\PasswordValidationRules;
 
 class FrontendAuthController extends Controller
 {
+    use PasswordValidationRules;
+
     public function __construct(StatefulGuard $guard)
     {
         $this->guard = Auth::guard('user_frontend');
@@ -104,5 +113,44 @@ class FrontendAuthController extends Controller
         }
 
         return app(FrontendLogoutResponse::class);
+    }
+
+    public function registerFrontend()
+    {
+        return view('auth.frontend.register-frontend');
+    }
+
+    public function createUserFrontend(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique(UserFrontend::class),
+            ],
+            'password' => $this->passwordRules(),
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/register/frontend')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        // Retrieve the validated input...
+        $validated = $validator->validated();
+
+        UserFrontend::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect('/register/frontend')->with([
+            'message' => 'Success create user frontend',
+        ]);
     }
 }
